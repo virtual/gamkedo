@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>Game</title>
+  <script>
+    var canvas;
+    var canvasContext;
+    var player;
+    var playFx = null;
+    var ball = {
+      x: 50,
+      y: 100,
+      speed: 3,
+      width: 10
+    }
+
+    window.onload = function () {
+      canvas = document.getElementById('gameCanvas');
+      canvasContext = canvas.getContext('2d');
+      toggleDraw();
+      
+    }
+
+    // Toggle the game movement
+    function toggleDraw() {
+      var framesPerSecond = 70;
+      if (playFx === null) {
+      playFx = setInterval(function() {
+        drawEverything();
+        moveEverything();
+      }, 1000/framesPerSecond);
+      } else {
+        clearInterval(playFx);
+        playFx = null;
+      }
+    } 
+
+    // Moves ball
+    function moveEverything() {
+      ball['x'] = ball['x'] + ball['speed']; 
+      if ((ball['x'] > canvas.width - ball['width']/2) || (ball['x'] < 0 - ball['width']/2)) {
+        ball['speed'] = -ball['speed'];
+      }  
+    }
+
+    // Draws elements on canvas
+    function drawEverything() {
+      colorRect(0, 0, canvas.width, canvas.height, 'black');
+      colorRect(0,0, 10, 100, 'white');
+      colorRect(ball['x'], 200, ball['width'], 10, 'red');
+    }
+
+    // Colors out the canvas with rectangles
+    function colorRect(leftX, topY, width, height, color) {
+      canvasContext.fillStyle = color;
+      canvasContext.fillRect(leftX, topY, width, height);
+    }
+
+  </script>
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+  <button onclick="toggleDraw()">Toggle</button>
+  <canvas id="gameCanvas" width="600" height="600" class="canvas"></canvas>
+</body>
+
+</html>
