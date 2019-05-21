@@ -3,10 +3,19 @@ html, body {
   width: 100%; 
   margin: 0;
   padding: 0;
+  overflow: hidden;
 }
 
 .canvas {
   height: 100%; 
   width: 100%; 
   background: #ccc;
+}
+.container { position: relative; }
+.toggle-button { 
+  position: absolute; 
+  width: 100px;
+  left: calc(50% - 50px);
+  top: 10px;
+  z-index: 1;
 }
