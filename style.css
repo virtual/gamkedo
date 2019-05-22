@@ -10,19 +10,20 @@ body {
 
 .canvas {
   height: 100%;
-  width: 100%;
-  background: #ccc;
+  width: 100%;  
+  position: relative;
 }
 
 .container {
   position: relative;
+  height: 100%; 
 }
 
 .toggle-button {
   position: absolute;
   width: 100px;
-  left: calc(50% - 50px);
-  top: 10px;
+  right: 30px; 
+  bottom: 10px;
   z-index: 1;
 }
 
@@ -38,13 +39,23 @@ button {
 .counters {
   display: flex;
   position: absolute;
-  width: 100%;
-  top: 30px;
+  width: 100%; 
   color: rgba(255, 255, 255, 0.4);
+  margin: 0 auto;
+  height: 100%;
+  justify-content: stretch;
+  align-items: stretch;
+  /* Pointer events none needed to capture mouse */
+  pointer-events:none; 
+  z-index: 2;
 }
 
 .counter {
   flex-grow: 1;
   text-align: center;
   font-size: 2rem;
+  margin: auto; 
+  height: 100%; 
+  padding-top: 50px;
 }
+.counter:first-child { border-right: 1px dashed rgba(255, 255, 255, 0.4); }

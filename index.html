@@ -32,8 +32,6 @@
         function (evt) {
           var mousePos = calculateMousePos(evt);
           paddle1['y'] = mousePos.y - PADDLE_HEIGHT / 2;
-          paddle2['y'] = mousePos.y - PADDLE_HEIGHT / 2;
-          // paddle1['x'] = mousePos.x;
         })
     }
 
@@ -110,10 +108,22 @@
       }
     }
 
+    function computerMovement() {
+      var compSpeed = 4;
+      var paddle2Center = paddle2['y'] + PADDLE_HEIGHT/2;
+      if (paddle2Center < ball['y'] - PADDLE_HEIGHT/4) {
+        paddle2['y'] += compSpeed;
+      } else if (paddle2Center > ball['y'] + PADDLE_HEIGHT/4) {
+        paddle2['y'] -= compSpeed;
+      }
+    }
+
     // Moves ball
     function moveEverything() {
-      ball['x'] = ball['x'] + ball['speedX'];
-      ball['y'] = ball['y'] + ball['speedY'];
+
+      computerMovement(); 
+      ball['x'] += ball['speedX'];
+      ball['y'] += ball['speedY'];
 
       // Right edge out-of-bounds
       if (ball['x'] > canvas.width - ball['width']) {
@@ -170,7 +180,7 @@
     }
 
     function colorCirc(centerX, centerY, radius, color) {
-      canvasContext.fillStyle = color;
+      if (color !== null) canvasContext.fillStyle = color;
       canvasContext.beginPath();
       canvasContext.arc(centerX, centerY, radius, 0, Math.PI * 2, true);
       canvasContext.fill();
