@@ -49,6 +49,9 @@
     function resetBall() {
       ball['x'] = canvas.width / 2;
       ball['y'] = canvas.height / 2;
+
+      document.getElementById('counter1').innerHTML = paddle1['hits']
+      document.getElementById('counter2').innerHTML = paddle2['hits']
       turn('speedX');
     }
 
@@ -71,24 +74,13 @@
       canvas.height = window.innerHeight;
     }
 
-    function addPoint(paddleID) {
-      if (paddleID === '2') { 
-        paddle2.hits++; 
-        document.getElementById('counter2').innerHTML = paddle2['hits']      
-      } else {
-        paddle1.hits++; 
-        document.getElementById('counter1').innerHTML = paddle1['hits']
-      }
-    }
     function isOnPaddle(paddleID) {
       if (paddleID === '2') {
         if (((ball['y']) > paddle2['y']) && (ball['y']) < paddle2['y'] + PADDLE_HEIGHT) {
-          paddle2.hits++;
           return true;
         }
       } // Default 1
       else if (((ball['y']) > paddle1['y']) && (ball['y']) < paddle1['y'] + PADDLE_HEIGHT) {
-        paddle1.hits++;
         return true;
       }
       return false;
@@ -110,10 +102,10 @@
 
     function computerMovement() {
       var compSpeed = 4;
-      var paddle2Center = paddle2['y'] + PADDLE_HEIGHT/2;
-      if (paddle2Center < ball['y'] - PADDLE_HEIGHT/4) {
+      var paddle2Center = paddle2['y'] + PADDLE_HEIGHT / 2;
+      if (paddle2Center < ball['y'] - PADDLE_HEIGHT / 4) {
         paddle2['y'] += compSpeed;
-      } else if (paddle2Center > ball['y'] + PADDLE_HEIGHT/4) {
+      } else if (paddle2Center > ball['y'] + PADDLE_HEIGHT / 4) {
         paddle2['y'] -= compSpeed;
       }
     }
@@ -121,25 +113,25 @@
     // Moves ball
     function moveEverything() {
 
-      computerMovement(); 
+      computerMovement();
       ball['x'] += ball['speedX'];
       ball['y'] += ball['speedY'];
 
       // Right edge out-of-bounds
-      if (ball['x'] > canvas.width - ball['width']) {
+      if (ball['x'] >= canvas.width - PADDLE_WIDTH) {
         if (isOnPaddle('2')) {
-          addPoint('2') 
           turn('speedX');
         } else {
+          paddle1.hits++;
           resetBall();
         }
       }
       // Left edge out-of-bounds
-      if (ball['x'] < 0 + ball['width']) {
+      if (ball['x'] < 0 + PADDLE_WIDTH) {
         if (isOnPaddle('1')) {
-          addPoint('1')
           turn('speedX');
         } else {
+          paddle2.hits++;
           resetBall();
         }
       }
