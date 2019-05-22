@@ -11,6 +11,7 @@
     var canvasContext;
     var player;
     var playFx = null;
+    var winningMode = false;
     var ball = {
       x: 50,
       y: 100,
@@ -20,6 +21,7 @@
     }
     const PADDLE_HEIGHT = 100;
     const PADDLE_WIDTH = 10;
+    const WINNING_SCORE = 2;
 
     window.onload = function () {
       canvas = document.getElementById('gameCanvas');
@@ -51,8 +53,20 @@
       ball['y'] = canvas.height / 2;
 
       document.getElementById('counter1').innerHTML = paddle1['hits']
-      document.getElementById('counter2').innerHTML = paddle2['hits']
+        document.getElementById('counter2').innerHTML = paddle2['hits']
+
+      if ((paddle1['hits'] >= WINNING_SCORE) || (paddle2['hits'] >= WINNING_SCORE)) { 
+        winningMode = true;
+        if (paddle1['hits'] >= WINNING_SCORE) {
+          // document.getElementById('counter1').innerHTML = "WINNER! " + paddle1['hits']
+          document.getElementById('counter1').classList.add('winner')
+        } else if (paddle2['hits'] >= WINNING_SCORE) {
+          document.getElementById('counter2').classList.add('winner')
+        }
+        toggleDraw();        
+      }   else {
       turn('speedX');
+      }
     }
 
     function calculateMousePos(evt) {
@@ -88,6 +102,21 @@
 
     // Toggle the game movement
     function toggleDraw() {
+      if (!winningMode) {
+        document.getElementById('counter1').classList.remove('winner')
+        document.getElementById('counter2').classList.remove('winner')
+        paddle1 = {
+          y: 0, hits: 0
+        }
+        paddle2 = {
+          y: 0,
+          hits: 0
+        }
+        ball['speedX'] = 5; 
+        ball['speedY'] = 3; 
+        resetBall();
+      } 
+      winningMode = false;
       var framesPerSecond = 70;
       if (playFx === null) {
         playFx = setInterval(function () {
@@ -120,6 +149,9 @@
       // Right edge out-of-bounds
       if (ball['x'] >= canvas.width - PADDLE_WIDTH) {
         if (isOnPaddle('2')) {
+          // Ball control, speed & velocity for edge-hitting
+          var delta = (Math.abs(((paddle2['y'] + PADDLE_HEIGHT / 2)) - ball['y']));
+          ball['speedY'] = delta * .2;
           turn('speedX');
         } else {
           paddle1.hits++;
@@ -129,6 +161,9 @@
       // Left edge out-of-bounds
       if (ball['x'] < 0 + PADDLE_WIDTH) {
         if (isOnPaddle('1')) {
+          // Ball control, speed & velocity for edge-hitting
+          var delta = (Math.abs(((paddle1['y'] + PADDLE_HEIGHT / 2)) - ball['y']));
+          ball['speedY'] = delta * .2;
           turn('speedX');
         } else {
           paddle2.hits++;
