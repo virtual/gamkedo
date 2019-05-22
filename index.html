@@ -23,36 +23,35 @@
 
     window.onload = function () {
       canvas = document.getElementById('gameCanvas');
-      canvas.width  = window.innerWidth;
+      canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
       canvasContext = canvas.getContext('2d');
-      toggleDraw();      
+      toggleDraw();
 
-      canvas.addEventListener('mousemove', 
-      function(evt){
-        var mousePos = calculateMousePos(evt);
-        paddle1['y'] = mousePos.y - PADDLE_HEIGHT/2;
-        paddle1['x'] = mousePos.x;
-      })
+      canvas.addEventListener('mousemove',
+        function (evt) {
+          var mousePos = calculateMousePos(evt);
+          paddle1['y'] = mousePos.y - PADDLE_HEIGHT / 2;
+          paddle2['y'] = mousePos.y - PADDLE_HEIGHT / 2;
+          // paddle1['x'] = mousePos.x;
+        })
     }
-
-
 
     // Left
     var paddle1 = {
       y: 0,
-      x: 0
+      hits: 0
     }
-
     // Right
     var paddle2 = {
       y: 0,
-      x: 0
+      hits: 0
     }
 
     function resetBall() {
       ball['x'] = canvas.width / 2;
       ball['y'] = canvas.height / 2;
+      turn('speedX');
     }
 
     function calculateMousePos(evt) {
@@ -60,61 +59,96 @@
       var root = document.documentElement;
       var mouseX = evt.clientX - rect.left - root.scrollLeft;
       var mouseY = evt.clientY - rect.top - root.scrollTop;
-
       return {
         x: mouseX,
         y: mouseY
       };
     }
 
-   
-    
 
-    window.onresize = function() {
-      canvas.width  = window.innerWidth;
+
+
+    window.onresize = function () {
+      canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
+    }
+
+    function addPoint(paddleID) {
+      if (paddleID === '2') { 
+        paddle2.hits++; 
+        document.getElementById('counter2').innerHTML = paddle2['hits']      
+      } else {
+        paddle1.hits++; 
+        document.getElementById('counter1').innerHTML = paddle1['hits']
+      }
+    }
+    function isOnPaddle(paddleID) {
+      if (paddleID === '2') {
+        if (((ball['y']) > paddle2['y']) && (ball['y']) < paddle2['y'] + PADDLE_HEIGHT) {
+          paddle2.hits++;
+          return true;
+        }
+      } // Default 1
+      else if (((ball['y']) > paddle1['y']) && (ball['y']) < paddle1['y'] + PADDLE_HEIGHT) {
+        paddle1.hits++;
+        return true;
+      }
+      return false;
     }
 
     // Toggle the game movement
     function toggleDraw() {
       var framesPerSecond = 70;
       if (playFx === null) {
-      playFx = setInterval(function() {
-        drawEverything();
-        moveEverything();
-      }, 1000/framesPerSecond);
+        playFx = setInterval(function () {
+          drawEverything();
+          moveEverything();
+        }, 1000 / framesPerSecond);
       } else {
         clearInterval(playFx);
         playFx = null;
       }
-    } 
+    }
 
     // Moves ball
     function moveEverything() {
-      ball['x'] = ball['x'] + ball['speedX']; 
-      ball['y'] = ball['y'] + ball['speedY']; 
-      
-      if ((ball['x'] > canvas.width - PADDLE_WIDTH/2) || (ball['x'] < 0 + PADDLE_WIDTH/2)) {
-        resetBall();
-      }
-   
+      ball['x'] = ball['x'] + ball['speedX'];
+      ball['y'] = ball['y'] + ball['speedY'];
 
-      if ((ball['x'] > canvas.width - ball['width']) || (ball['x'] < 0 + ball['width'])) {
+      // Right edge out-of-bounds
+      if (ball['x'] > canvas.width - ball['width']) {
+        if (isOnPaddle('2')) {
+          addPoint('2') 
           turn('speedX');
-        }  
-        
-        if ((ball['y'] > canvas.height - ball['width']) || (ball['y'] < 0 + ball['width'])) {
-          turn('speedY');
-        }  
+        } else {
+          resetBall();
+        }
+      }
+      // Left edge out-of-bounds
+      if (ball['x'] < 0 + ball['width']) {
+        if (isOnPaddle('1')) {
+          addPoint('1')
+          turn('speedX');
+        } else {
+          resetBall();
+        }
+      }
 
-      
+      if (ball['y'] > canvas.height - ball['width']) {
+        turn('speedY');
+      }
+      if (ball['y'] < 0 + ball['width']) {
+        turn('speedY');
+      }
+
     }
 
     function playSound(sound) {
-      var audio = new Audio('./sounds/'+sound+'.wav');
+      var audio = new Audio('./sounds/' + sound + '.wav');
       audio.volume = 0.05;
       audio.play();
     }
+
     function turn(dir) {
       ball[dir] = -ball[dir];
       playSound('boom');
@@ -122,8 +156,10 @@
     // Draws elements on canvas
     function drawEverything() {
       colorRect(0, 0, canvas.width, canvas.height, 'black');
-      colorRect(0,paddle1['y'], 10, 100, 'white');
-      colorRect(canvas.width - PADDLE_WIDTH,paddle2['y'], 10, 100, 'white');
+      // Paddle1, left
+      colorRect(0, paddle1['y'], PADDLE_WIDTH, PADDLE_HEIGHT, 'white');
+      // Paddle2, right
+      colorRect(canvas.width - PADDLE_WIDTH, paddle2['y'], PADDLE_WIDTH, PADDLE_HEIGHT, 'white');
       colorCirc(ball['x'], ball['y'], ball['width'], 10, 'white');
     }
 
@@ -136,10 +172,9 @@
     function colorCirc(centerX, centerY, radius, color) {
       canvasContext.fillStyle = color;
       canvasContext.beginPath();
-      canvasContext.arc(centerX, centerY, radius, 0, Math.PI*2, true);
+      canvasContext.arc(centerX, centerY, radius, 0, Math.PI * 2, true);
       canvasContext.fill();
     }
-
   </script>
   <link rel="stylesheet" href="style.css">
 </head>
@@ -147,6 +182,10 @@
 <body>
   <div class="container">
     <button class="toggle-button" onclick="toggleDraw()">Toggle</button>
+    <div class="counters">
+      <div class="counter" id="counter1">0</div>
+      <div class="counter" id="counter2">0</div>
+    </div>
     <canvas id="gameCanvas" class="canvas"></canvas>
   </div>
 </body>
